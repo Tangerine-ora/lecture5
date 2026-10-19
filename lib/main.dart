@@ -1,3 +1,6 @@
+// 生命周期日志按课堂要求使用 print 观察钩子顺序，生产代码应换 debugPrint/日志框架
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,7 +37,40 @@ class _CounterPageState extends State<CounterPage> {
   int _count = 0;
   int _step = 1; // 改造一：新增步长状态
 
+  // ---- 改造二：State 生命周期日志（每个钩子一行 print） ----
+  @override
+  void initState() {
+    super.initState();
+    print('[lifecycle] initState：一次性初始化，State 挂载');
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print('[lifecycle] didChangeDependencies：依赖的 InheritedWidget（Theme）变化');
+  }
+
+  @override
+  void didUpdateWidget(covariant CounterPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('[lifecycle] didUpdateWidget：父级传入新配置 title=${oldWidget.title}');
+  }
+
+  @override
+  void deactivate() {
+    print('[lifecycle] deactivate：被暂时从树上摘下');
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    print('[lifecycle] dispose：State 销毁，此处应取消订阅/释放控制器');
+    super.dispose();
+  }
+
+  // ---- 交互逻辑 ----
   void _increment() {
+    print('[lifecycle] FAB 点击：setState 即将把当前 Element 标记为 dirty');
     setState(() {
       _count += _step; // 每次按步长累加，不再是固定 +1
     });
@@ -48,6 +84,7 @@ class _CounterPageState extends State<CounterPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('[lifecycle] build：count=$_count, step=$_step');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -74,6 +111,18 @@ class _CounterPageState extends State<CounterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // 改造二：资源图片作空状态插画（pubspec 声明 assets/images/）
+            if (_count == 0) ...[
+              Image.asset(
+                'assets/images/logo.png',
+                width: 160,
+                height: 160,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 12),
+              const Text('点右下角 + 开始计数'),
+              const SizedBox(height: 12),
+            ],
             const Text('你已经按了按钮这么多次：'),
             Text(
               '$_count',
