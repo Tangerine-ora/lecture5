@@ -1,5 +1,7 @@
 # counter_deep Widget 树手绘图（文字版）
 
+![Widget 树示意图](widget_tree.png)
+
 > 说明：课堂要求用纸或绘图工具手绘，本文件是手绘底稿（文字树），对照下方层级与
 > Stateless/Stateful 标注誊抄即可。树对应改造完成后的最终版 main.dart。
 
